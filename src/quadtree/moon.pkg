@@ -1,0 +1,10 @@
+// quadtree 包：d3-quadtree 对齐的松散点四叉树（Barnes-Hut 载体）。
+// 不含聚合缓存：manyBody/collide 每次 force 重建并自行聚合。
+import {
+  "moonbitlang/core/double",
+}
+
+import {
+  "moonbitlang/core/test",
+  "moonbitlang/core/double",
+} for "test"

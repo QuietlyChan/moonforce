@@ -1,0 +1,18 @@
+# MoonBit
+_build/
+target/
+
+# JS / Bun
+node_modules/
+packages/moonforce/dist/
+demo/wasm/
+
+# IDE / 工具
+.trae/
+.idea/
+.vscode/
+
+# misc
+*.log
+.DS_Store
+Thumbs.db

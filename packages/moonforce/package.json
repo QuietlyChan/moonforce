@@ -1,0 +1,36 @@
+{
+  "name": "moonforce",
+  "version": "0.1.0",
+  "description": "Force-directed graph layout engine (d3-force compatible) compiled from MoonBit to WASM-GC",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "graph",
+    "layout",
+    "force-directed",
+    "d3",
+    "d3-force",
+    "wasm",
+    "wasm-gc",
+    "moonbit",
+    "barnes-hut"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moonforce/moonforce"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # —— MoonBit 工具链（锁定版本，见 AGENTS.md）——
+      - name: Install MoonBit toolchain
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          moon upgrade --version 0.1.20260713 || true
+
+      - name: Check MoonBit version
+        run: moon version --all
+
+      # —— Bun ——
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install JS deps
+        run: bun install --frozen-lockfile
+
+      - name: MoonBit tests (含 golden 数值对齐)
+        run: moon test src/types src/quadtree src/forces src/simulation
+
+      - name: Build wasm-gc (release)
+        run: moon build --target wasm-gc --release
+
+      - name: Assert wasm import section empty (可移植性)
+        run: bun scripts/check-wasm.mjs _build/wasm-gc/release/build/src/ffi/ffi.wasm
+
+      - name: Build npm package
+        run: bun scripts/build.mjs
+
+      - name: TS 端到端测试 (含 d3-force 数值对齐)
+        run: bun test packages/moonforce
+
+      - name: Format check
+        run: moon fmt --check || moon fmt && git diff --exit-code src/

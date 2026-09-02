@@ -1,0 +1,10 @@
+// types 包：SoA 节点池与随机源。
+import {
+  "moonbitlang/core/math",
+  "moonbitlang/core/double",
+}
+
+import {
+  "moonbitlang/core/test",
+  "moonbitlang/core/double",
+} for "test"

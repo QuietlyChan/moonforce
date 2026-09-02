@@ -1,0 +1,10 @@
+// forces 包：d3-force 各力模型的 MoonBit 实现（enum 静态分发，无装箱）。
+import {
+  "moonbitlang/core/double",
+  "moonforce/moonforce/src/types",
+  "moonforce/moonforce/src/quadtree",
+}
+
+import {
+  "moonbitlang/core/test",
+} for "test"

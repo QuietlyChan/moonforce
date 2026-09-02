@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>moonforce × d3-force 性能对比</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff; --accent2: #d2a8ff; --good: #7ee787;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; padding: 24px; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h1 .bit { color: var(--accent); } h1 .force { color: var(--accent2); }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  button { background: #21262d; color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer; }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  button:hover { border-color: var(--accent); }
+  #running { color: var(--accent); font-size: 13px; display: none; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  th { background: var(--panel); color: var(--muted); font-weight: 500; }
+  th:first-child, td:first-child { text-align: left; }
+  tr:hover td { background: rgba(88,166,255,0.05); }
+  .speedup { color: var(--good); font-weight: 600; }
+  .notes { margin-top: 20px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+  .notes b { color: var(--text); }
+  a { color: var(--accent); text-decoration: none; }
+  #err { color: #ff7b72; font-size: 13px; margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+<h1><span class="bit">moon</span><span class="force">force</span> × d3-force 性能对比</h1>
+<div class="sub">相同初始条件 · 相同力配置（charge(-30) + link(30)，无 collide）· 同步 tick · warmup 50 + 300 tick · 5 轮取中位</div>
+<div class="bar">
+  <button class="primary" id="run">运行基准</button>
+  <button id="export">导出 JSON</button>
+  <span id="running">运行中…（大图数据集需要一点时间）</span>
+  <span class="spacer"></span>
+  <a href="index.html">← 返回 demo</a>
+</div>
+<div id="err"></div>
+<table id="result">
+  <thead>
+    <tr>
+      <th>数据集</th><th>节点/边</th>
+      <th>d3-force<br>纯计算 ms/tick</th>
+      <th>moonforce<br>纯计算 ms/tick</th>
+      <th>加速比<br>(纯计算)</th>
+      <th>d3-force<br>全口径 ms/tick</th>
+      <th>moonforce<br>全口径 ms/tick</th>
+      <th>加速比<br>(全口径)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<div class="notes">
+  <b>口径说明</b>：纯计算 = 只 tick 不回读坐标（d3 天然在 JS 堆上，无回传成本；moonforce 不调用 positions()）；
+  全口径 = tick + 每帧回读全量坐标（真实渲染场景成本）。<br>
+  <b>公平性</b>：d3-force 为 npm 最新版（d3-force@3），不做任何替换或优化；两边相同初始坐标、相同力添加顺序；报告中包含环境信息。<br>
+  <b>诚实呈现</b>：moonforce wasm 28KB（未压缩）vs d3-force 相关包 gzip ~25KB，体积上 d3 更小；
+  小规模（≤500 节点）跨界开销占比升高，moonforce 优势缩小甚至持平——表格如实体现在每个规模上。
+</div>
+<script type="importmap">
+{
+  "imports": {
+    "d3-force": "/node_modules/d3-force/src/index.js",
+    "d3-quadtree": "/node_modules/d3-quadtree/src/index.js",
+    "d3-dispatch": "/node_modules/d3-dispatch/src/index.js",
+    "d3-timer": "/node_modules/d3-timer/src/index.js"
+  }
+}
+</script>
+<script type="module" src="bench.js"></script>
+</body>
+</html>

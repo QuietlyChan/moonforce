@@ -1,0 +1,10 @@
+// ffi 包：唯一的 foreign_library 包，所有 #export_name 导出都在这里。
+// 导出名统一 mf_ 前缀 + snake_case（C 标识符约束），包内唯一。
+// 纯数值 ABI（Int/Double，无 String）→ wasm Import 段为空。
+import {
+  "moonforce/moonforce/src/types",
+  "moonforce/moonforce/src/forces",
+  "moonforce/moonforce/src/simulation",
+}
+
+pkgtype(kind: "foreign_library")

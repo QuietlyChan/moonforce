@@ -1,0 +1,14 @@
+{
+  "name": "moonforce-workspace",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "moon build --target wasm-gc --release && bun scripts/build.mjs",
+    "check:wasm": "bun scripts/check-wasm.mjs _build/wasm-gc/release/build/src/ffi/ffi.wasm",
+    "golden": "bun scripts/golden.mjs",
+    "test": "moon test src/types src/quadtree src/forces src/simulation && bun test packages/moonforce"
+  },
+  "devDependencies": {
+    "d3-force": "^3.0.0"
+  }
+}
