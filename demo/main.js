@@ -55,6 +55,10 @@ async function rebuild() {
   state.nodeMeta = nodes.map((nd) => ({ deg: nd.deg, group: nd.group ?? 0 }));
   state.n = nodes.length;
 
+  // 释放旧 simulation 的 wasm 句柄（滑块/数据集切换会反复 rebuild）
+  if (state.sim) state.sim.dispose();
+  drag = null;
+
   const sim = state.mf.createSimulation(state.n);
   state.sim = sim;
   sim.setVelocityDecay(params.friction);
@@ -92,9 +96,12 @@ function running(v) {
   $("stState").textContent = v ? "运行中" : "收敛";
 }
 
+let reheatTimer = 0;
 function reheat() {
-  // 参数变化时重建（保持力参数简单一致）
-  rebuild();
+  // 参数变化时重建（保持力参数简单一致）。
+  // input 事件连续触发，去抖避免大图（数千节点）拖动滑块时反复全量重建。
+  clearTimeout(reheatTimer);
+  reheatTimer = setTimeout(() => rebuild(), 120);
 }
 
 // —— 视图与交互 ——

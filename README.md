@@ -1,3 +1,9 @@
+<div align="center">
+
+**简体中文** · [English](README_EN.md)
+
+</div>
+
 # moonforce
 
 **用 [MoonBit](https://www.moonbitlang.com/) 编写、编译为 WASM-GC 的力导向图布局引擎** —— 精确对齐 [d3-force](https://github.com/d3/d3-force) 3.x 语义的现代替代。
@@ -158,7 +164,7 @@ src/
 ├── forces/      7 种力（enum 静态分发，无 trait 装箱）
 │                center · manyBody(Barnes-Hut) · link · collide · x · y · radial
 ├── simulation/  tick 状态机（alpha 衰减三步循环）
-└── ffi/         foreign_library：31 个 mf_* 导出（i32 句柄表，
+└── ffi/         foreign_library：30 个 mf_* 导出（i32 句柄表，
                  纯数值 ABI → wasm Import 段为空）
 
 packages/moonforce/   npm 包（TS 胶水：loadMoonforce/Simulation 类，数据驻留 wasm）
@@ -192,3 +198,9 @@ bun scripts/serve.mjs      # demo + bench
 ## License
 
 MIT。语义对齐参考的 [d3-force](vendor/d3-force)（ISC 许可）与 [d3-quadtree](vendor/d3-quadtree)（ISC 许可）源码已 vendor 进仓库，谨此致谢。
+
+<div align="center">
+
+**简体中文** · [English](README_EN.md)
+
+</div>
