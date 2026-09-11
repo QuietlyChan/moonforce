@@ -15,9 +15,8 @@ jobs:
       # —— MoonBit 工具链（锁定版本，见 AGENTS.md）——
       - name: Install MoonBit toolchain
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s 0.1.20260713
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-          moon upgrade --version 0.1.20260713 || true
 
       - name: Check MoonBit version
         run: moon version --all
@@ -46,4 +45,4 @@ jobs:
         run: bun test packages/moonforce
 
       - name: Format check
-        run: moon fmt --check || moon fmt && git diff --exit-code src/
+        run: moon fmt --check
