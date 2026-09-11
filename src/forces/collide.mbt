@@ -64,6 +64,7 @@ fn CollideForce::initialize(
   nodes : @types.NodePool,
   random : @types.Lcg,
 ) -> Unit {
+  ignore(self)
   ignore(nodes)
   ignore(random)
 }

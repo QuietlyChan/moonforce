@@ -21,16 +21,22 @@ moon add moonforce/moonforce
 ## 最小示例
 
 ```moonbit nocheck
-import { "moonforce/moonforce/src/simulation" }
-import { "moonforce/moonforce/src/forces" }
+///|
+import {
+  "moonforce/moonforce/src/simulation",
+}
 
+///|
+import {
+  "moonforce/moonforce/src/forces",
+}
+
+///|
 test "force-directed layout" {
   let sim : @simulation.Simulation = @simulation.Simulation::new(6)
   // 力添加顺序 = d3 Map 插入序，影响数值轨迹
   ignore(
-    sim.add_force(
-      @forces.Force::ManyBody(@forces.ManyBodyForce::new(6, -30.0)),
-    ),
+    sim.add_force(@forces.Force::ManyBody(@forces.ManyBodyForce::new(6, -30.0))),
   )
   let link : @forces.LinkForce = @forces.LinkForce::create(6, 30.0, 1)
   link.add_edge(0, 1)

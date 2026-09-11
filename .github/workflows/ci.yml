@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # —— MoonBit 工具链（锁定版本，见 AGENTS.md）——
+      # —— MoonBit 工具链（跟随 latest，见 AGENTS.md；官方 CDN 不托管历史版本）——
       - name: Install MoonBit toolchain
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s 0.1.20260713
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
 
       - name: Check MoonBit version

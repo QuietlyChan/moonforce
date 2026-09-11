@@ -185,7 +185,7 @@ bun test packages/moonforce   # 端到端（含 d3 数值对齐）
 bun scripts/serve.mjs      # demo + bench
 ```
 
-工具链版本见 [AGENTS.md](AGENTS.md)（moon 工具链周更，CI 锁定版本）。
+工具链版本见 [AGENTS.md](AGENTS.md)（moon 工具链周更，本地与 CI 统一跟随 latest，golden 测试守卫数值语义）。
 
 ## Roadmap
 

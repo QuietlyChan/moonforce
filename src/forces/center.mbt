@@ -15,7 +15,7 @@ pub fn CenterForce::new(
   cy : Double,
   strength : Double,
 ) -> CenterForce {
-  { cx, cy, strength }
+  { cx, cy, strength, }
 }
 
 ///|

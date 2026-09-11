@@ -96,7 +96,7 @@ fn ManyBodyForce::accumulate(
           Some(@quadtree.Leaf(l)) => {
             // d3: if ((q = quad[i]) && (c = Math.abs(q.value)))
             let c = l.value.abs()
-            if not(c.is_nan()) && c != 0.0 {
+            if !c.is_nan() && c != 0.0 {
               strength = strength + l.value
               weight = weight + c
               x = x + c * l.cx
@@ -105,7 +105,7 @@ fn ManyBodyForce::accumulate(
           }
           Some(@quadtree.Branch(qb)) => {
             let c = qb.value.abs()
-            if not(c.is_nan()) && c != 0.0 {
+            if !c.is_nan() && c != 0.0 {
               strength = strength + qb.value
               weight = weight + c
               x = x + c * qb.cx

@@ -1,17 +1,12 @@
 # AGENTS.md — 开发约定与工具链版本
 
-## 工具链版本（锁定）
+## 工具链版本（跟随 latest）
 
-MoonBit 工具链**每周发版**，本仓库在 CI 与本地开发中锁定以下版本（R1 风险缓解）：
+MoonBit 工具链**每周发版**，且官方 CDN 只托管 `latest`（历史版本下载 403，无法钉住具体版本），因此本仓库策略为**本地与 CI 统一跟随 latest**（2026-09-11 实测：moon 0.1.20260904 / moonc v0.10.12+1634b282e / Bun 1.4+）：
 
-```
-moon  0.1.20260713 (75c7e1f 2026-07-13)
-moonc 0.10.4+2cc641edf (2026-07-15)
-moonrun 0.1.20260713
-Bun   >= 1.4
-```
-
-安装特定版本：`curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash`（或参考 [moon 官方文档](https://docs.moonbitlang.com)）。语法漂移时优先查 `moon.pkg` schema 与 FFI 文档，不要依赖旧博客。
+- 数值语义由 golden 测试 + TS 端到端（误差 < 1e-9）守卫——工具链升级后必须全绿才算有效；
+- 格式以当前 latest 的 `moon fmt` 输出为准，升级后先本地 `moon fmt` 再提交，避免 CI 格式门禁漂移；
+- 安装：`curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash`（或参考 [moon 官方文档](https://docs.moonbitlang.com)）。语法漂移时优先查 `moon.pkg` schema 与 FFI 文档，不要依赖旧博客。
 
 ## 项目结构
 

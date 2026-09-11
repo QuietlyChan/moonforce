@@ -10,12 +10,12 @@ pub struct Lcg {
 ///|
 /// 默认种子 s = 1（对齐 d3-force 3.x 默认 lcg）。
 pub fn Lcg::new() -> Lcg {
-  { s: 1 }
+  { s: 1, }
 }
 
 ///|
 pub fn Lcg::with_seed(seed : UInt) -> Lcg {
-  { s: seed }
+  { s: seed, }
 }
 
 ///|

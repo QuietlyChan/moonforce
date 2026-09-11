@@ -21,7 +21,7 @@ let initial_radius : Double = 10.0
 
 ///|
 /// d3-force simulation.js 的 initialAngle：pi * (3 - sqrt(5))
-let initial_angle : Double = @math.pi * (3.0 - 5.0.sqrt())
+let initial_angle : Double = @math.PI * (3.0 - 5.0.sqrt())
 
 ///|
 /// 创建全 NaN 的原始节点池（未初始化）。

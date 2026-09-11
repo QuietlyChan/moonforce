@@ -37,12 +37,12 @@ pub struct QLeaf {
 
 ///|
 fn new_branch() -> QBranch {
-  { children: FixedArray::make(4, None), value: 0.0, cx: 0.0, cy: 0.0, r: 0.0 }
+  { children: FixedArray::make(4, None), value: 0.0, cx: 0.0, cy: 0.0, r: 0.0, }
 }
 
 ///|
 fn new_leaf(x : Double, y : Double, idx : Int) -> QLeaf {
-  { x, y, idx, next: None, value: 0.0, cx: 0.0, cy: 0.0, r: 0.0 }
+  { x, y, idx, next: None, value: 0.0, cx: 0.0, cy: 0.0, r: 0.0, }
 }
 
 ///|
@@ -397,7 +397,7 @@ fn make_quad(
   x1 : Double,
   y1 : Double,
 ) -> Quad {
-  { node, x0, y0, x1, y1 }
+  { node, x0, y0, x1, y1, }
 }
 
 ///|
