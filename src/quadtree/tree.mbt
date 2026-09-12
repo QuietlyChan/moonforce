@@ -415,7 +415,7 @@ pub fn Quadtree::visit(self : Quadtree, callback : (Quad) -> Bool) -> Unit {
         let node = quad.node
         let prune = callback(quad)
         // d3: if (!callback(...) && node.length) → 返回 false 且是内部节点才深入
-        if not(prune) && qnode_is_branch(node) {
+        if !prune && qnode_is_branch(node) {
           let children = match node {
             Branch(b) => b.children
             Leaf(_) => abort("unreachable")

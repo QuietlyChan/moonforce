@@ -1,13 +1,13 @@
 // moonforce — Force-directed graph layout engine in MoonBit
 // https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
 
-name = "moonforce/moonforce"
+name = "QuietlyChan/moonforce"
 
 version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = ""
+repository = "https://github.com/QuietlyChan/moonforce"
 
 license = "MIT"
 

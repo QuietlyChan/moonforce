@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moonforce/moonforce"
+    "url": "git+https://github.com/QuietlyChan/moonforce.git"
   },
   "engines": {
     "bun": ">=1.0.0"

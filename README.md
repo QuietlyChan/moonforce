@@ -1,52 +1,54 @@
 <div align="center">
 
-**简体中文** · [English](README_EN.md)
+[简体中文](README.zh-CN.md) · **English**
 
 </div>
 
 # moonforce
 
-**用 [MoonBit](https://www.moonbitlang.com/) 编写、编译为 WASM-GC 的力导向图布局引擎** —— 精确对齐 [d3-force](https://github.com/d3/d3-force) 3.x 语义的现代替代。
+[![CI](https://github.com/QuietlyChan/moonforce/actions/workflows/ci.yml/badge.svg)](https://github.com/QuietlyChan/moonforce/actions/workflows/ci.yml)
 
-[在线 Demo](https://moonforce.github.io/moonforce/) · [性能对比基准](https://moonforce.github.io/moonforce/demo/bench.html)
+**A force-directed graph layout engine written in [MoonBit](https://www.moonbitlang.com/), compiled to WASM-GC** — a modern alternative that precisely matches [d3-force](https://github.com/d3/d3-force) 3.x semantics.
 
-## 为什么是 moonforce
+[Live Demo](https://quietlychan.github.io/moonforce/) · [Performance Benchmark](https://quietlychan.github.io/moonforce/demo/bench.html)
 
-- **快**：Barnes-Hut O(N log N) + SoA 数据布局 + wasm-gc 编译。相同初始条件、相同力配置下，对比 d3-force@3 的实测加速比（10000 节点 tick 级）：
+## Why moonforce
 
-  | 规模 | d3-force | moonforce | 加速比 |
+- **Fast**: Barnes-Hut O(N log N) + SoA data layout + wasm-gc compilation. Measured speedup over d3-force@3 under identical initial conditions and force configuration (tick time at 10k nodes):
+
+  | Scale | d3-force | moonforce | Speedup |
   |---|---|---|---|
-  | 500 节点 | 3.0 ms/tick | 1.0 ms/tick | **3.0×** |
-  | 2000 节点 | 12.0 ms/tick | 7.0 ms/tick | **1.7×** |
-  | 5000 节点 | 37.0 ms/tick | 20.0 ms/tick | **1.85×** |
-  | 10000 节点 | 81.0 ms/tick | 46.0 ms/tick | **1.76×** |
+  | 500 nodes | 3.0 ms/tick | 1.0 ms/tick | **3.0×** |
+  | 2000 nodes | 12.0 ms/tick | 7.0 ms/tick | **1.7×** |
+  | 5000 nodes | 37.0 ms/tick | 20.0 ms/tick | **1.85×** |
+  | 10000 nodes | 81.0 ms/tick | 46.0 ms/tick | **1.76×** |
 
-  （实测环境见 [bench.html](demo/bench.html)，可在自己浏览器中复现；诚实说明：≤500 节点时跨界开销占比升高，优势缩小甚至持平）
+  (Measured in [bench.html](demo/bench.html) — reproducible in your own browser. Honest caveat: at ≤500 nodes, boundary-crossing overhead grows and the advantage shrinks or disappears.)
 
-- **小**：wasm 产物 **28 KB**（未压缩，Import 段为空——零宿主依赖，`WebAssembly.instantiate(bytes, {})` 即用）
+- **Small**: wasm artifact is **28 KB** (uncompressed, empty import section — zero host dependencies, works with a plain `WebAssembly.instantiate(bytes, {})`)
 
-- **数值可复现**：与 d3-force 3.x **位级对齐**。golden 测试用固定种子跑 d3-force 生成轨迹 fixture，moonforce 断言 300 tick 每坐标绝对误差 < 1e-9——包括重合点 jiggle 扰动和 lcg 随机序列的消耗顺序（见 [scripts/golden.mjs](scripts/golden.mjs)）
+- **Numerically reproducible**: **bit-level aligned** with d3-force 3.x. Golden tests run d3-force with a fixed seed to generate trajectory fixtures; moonforce asserts absolute per-coordinate error < 1e-9 over 300 ticks — including coincident-point jiggle perturbation and the exact consumption order of the lcg random sequence (see [scripts/golden.mjs](scripts/golden.mjs))
 
-- **MoonBit 原生**：[mooncakes.io](https://mooncakes.io) 可直接 `moon add`，也可以从 npm 以 wasm 模块引入——一套核心算法，两种生态
+- **MoonBit native**: install directly from [mooncakes.io](https://mooncakes.io) with `moon add`, or consume as a wasm module from npm — one core implementation, two ecosystems
 
-## 快速开始
+## Quick Start
 
-### 在线体验
+### Try it locally
 
 ```bash
-git clone https://github.com/moonforce/moonforce
+git clone https://github.com/QuietlyChan/moonforce
 cd moonforce
 bun install
-bun run build        # moon build + npm 包构建
+bun run build        # moon build + npm package build
 bun scripts/serve.mjs
-# → http://localhost:8080/demo/（交互式布局）
-# → http://localhost:8080/demo/bench.html（与 d3-force 性能对比）
+# → http://localhost:8080/demo/ (interactive layout)
+# → http://localhost:8080/demo/bench.html (d3-force comparison)
 ```
 
-### npm（JS/TS）
+### npm (JS/TS)
 
 ```bash
-bun add moonforce   # 或 npm i moonforce
+bun add moonforce   # or npm i moonforce
 ```
 
 ```ts
@@ -55,16 +57,16 @@ import { loadMoonforce } from "moonforce";
 const mf = await loadMoonforce();
 const sim = mf.createSimulation(nodes.length);
 
-// 预置初始坐标（与 d3 preset x/y 等价）
+// Preset initial positions (equivalent to d3 preset x/y)
 nodes.forEach((n, i) => sim.setNodePos(i, n.x, n.y));
 
-// 力添加顺序 = d3 Map 插入序（影响轨迹，按 d3 惯例添加）
+// Force insertion order = d3 Map insertion order (affects the trajectory; follow d3 conventions)
 sim.addManyBodyForce({ strength: -30 });
-sim.addLinkForce(links, { distance: 30 });   // links: [{source, target}] 节点索引对
+sim.addLinkForce(links, { distance: 30 });   // links: [{source, target}] node index pairs
 sim.addCollideForce({ radius: 3 });
 sim.addCenterForce();
 
-// 时间驱动由宿主负责（rAF / worker 均可）
+// Time driving is the host's responsibility (rAF / worker, either works)
 const xy = new Float64Array(nodes.length * 2);
 function frame() {
   sim.step(1);
@@ -75,26 +77,26 @@ function frame() {
 requestAnimationFrame(frame);
 ```
 
-拖拽节点（对齐 d3 惯例）：
+Dragging nodes (matching d3 conventions):
 
 ```ts
-const hit = sim.find(worldX, worldY, 15);     // 返回最近节点索引或 null
-sim.setAlphaTarget(0.3);                      // 拖拽时保持热度
+const hit = sim.find(worldX, worldY, 15);     // nearest node index or null
+sim.setAlphaTarget(0.3);                      // keep warm while dragging
 sim.setFixed(hit, worldX, worldY);
-// mouseup：
+// on mouseup:
 sim.setFixed(hit, null, null);
-sim.setAlphaTarget(0);                        // 冷却收敛
+sim.setAlphaTarget(0);                        // cool down and settle
 ```
 
-### MoonBit（mooncakes）
+### MoonBit (mooncakes)
 
 ```bash
-moon add moonforce/moonforce
+moon add QuietlyChan/moonforce
 ```
 
 ```moonbit
-import { "moonforce/moonforce/src/simulation" }
-import { "moonforce/moonforce/src/forces" }
+import { "QuietlyChan/moonforce/src/simulation" }
+import { "QuietlyChan/moonforce/src/forces" }
 
 let sim : @simulation.Simulation = @simulation.Simulation::new(100)
 ignore(
@@ -105,102 +107,102 @@ ignore(
 ignore(sim.tick(300))
 ```
 
-## 语义对齐（这是本项目的核心承诺）
+## Semantic Alignment (the core promise of this project)
 
-moonforce 逐行对照 [d3-force](vendor/d3-force) 与 [d3-quadtree](vendor/d3-quadtree) 源码实现，三处"常见误解"已按源码修正：
+moonforce is implemented line-by-line against the [d3-force](vendor/d3-force) and [d3-quadtree](vendor/d3-quadtree) sources. Three "common misconceptions" have been corrected per the source:
 
-| 要点 | d3-force 3.x 实际行为 |
+| Point | Actual d3-force 3.x behavior |
 |---|---|
-| manyBody theta 默认 | **0.9**（内部存 theta²=0.81），不是 0.8 |
-| forceCenter | **位置硬移动**：`x -= (Σx/n - cx) * strength`，不经过速度系统 |
-| forceLink | **预测位置**：`target.x + target.vx - source.x - source.vx` |
+| manyBody default theta | **0.9** (internally stored as theta²=0.81), not 0.8 |
+| forceCenter | **Hard position shift**: `x -= (Σx/n - cx) * strength`, bypassing the velocity system |
+| forceLink | **Predicted positions**: `target.x + target.vx - source.x - source.vx` |
 
-更深的细节对齐：
+Deeper details that are aligned:
 
-- **tick 三步序**：alpha 衰减 → 按插入序遍历 forces → `x += vx *= velocityDecay`（先衰减后位移的复合赋值）
-- **lcg 随机源**：`(1664525·s + 1013904223) mod 2^32`，与 JS 位精确一致；jiggle 的**消耗顺序**（visit 先序 0-3、visitAfter 自底向上）逐节点对齐
-- **四叉树**：cover 整数单元起步防浮点漂移、重合点 next 链表（新点为表头）、分裂 do-while 精确复刻
-- **Barnes-Hut**：`w²/θ² < l` 判定、distanceMin 软下限（几何平均 `√(dmin²·l)`）、`!quad.value` 剪枝对齐 JS falsy（0/-0/NaN 均剪枝）
-- **forceCollide**：预测位置建树、AABB 剪枝、每对只处理一次（`data.index > node.index`）、权重 `rj²/(ri²+rj²)`
-- **数值常量**：`alphaDecay = 0.02276277904418933`（JS `Math.pow` 实算后硬编码，规避 wasm pow 实现的 ULP 差异）
+- **tick 3-step order**: alpha decay → iterate forces in insertion order → `x += vx *= velocityDecay` (the decay-then-move compound assignment)
+- **lcg random source**: `(1664525·s + 1013904223) mod 2^32`, bit-exact with JS; the **consumption order** of jiggle calls (visit pre-order 0-3, visitAfter bottom-up) is aligned node by node
+- **Quadtree**: cover starts from integer cells to prevent floating-point drift, coincident-point `next` chains (new point becomes head), exact do-while split loop
+- **Barnes-Hut**: `w²/θ² < l` criterion, distanceMin soft floor (geometric mean `√(dmin²·l)`), `!quad.value` pruning matched to JS falsy (0/-0/NaN all prune)
+- **forceCollide**: tree built from predicted positions, AABB pruning, each pair handled once (`data.index > node.index`), weight `rj²/(ri²+rj²)`
+- **Numeric constants**: `alphaDecay = 0.02276277904418933` (computed with JS `Math.pow`, then hardcoded to avoid ULP differences in wasm pow implementations)
 
-**golden 测试方法**：`bun scripts/golden.mjs` 用 d3-force@3（固定种子、显式初始坐标）跑 8 个配置矩阵各 300 tick，生成 [src/simulation/golden_test.mbt](src/simulation/golden_test.mbt)（当前 27 个用例全绿，误差 < 1e-9）。
+**Golden test method**: `bun scripts/golden.mjs` runs d3-force@3 (fixed seed, explicit initial coordinates) over a matrix of 8 configurations × 300 ticks each and generates [src/simulation/golden_test.mbt](src/simulation/golden_test.mbt) (currently 27 cases, all green, error < 1e-9).
 
-### 与 d3-force 的已知差异
+### Known differences from d3-force
 
-- 每种力**至多一个实例**（d3 允许同名多实例，如两个 forceX）——以力类型代名字，MVP 简化
-- per-node/per-link 的 strength/distance 函数：改为统一标量参数 + 单点 setter（`setCollideRadius` 等）
-- timer/dispatch 事件层不进 wasm：时间驱动与 `on("tick")` 回调由 JS 宿主实现（渲染循环本来就在 JS 侧）
-- `simulation.find` 为线性扫描（d3 同为线性，语义一致）
+- Each force has **at most one instance** (d3 allows multiple same-named instances, e.g. two forceX) — force type replaces the name; an MVP simplification
+- per-node/per-link strength/distance functions: replaced by uniform scalar parameters + per-point setters (`setCollideRadius` etc.)
+- The timer/dispatch event layer stays out of wasm: time driving and `on("tick")` callbacks are implemented by the JS host (the render loop lives on the JS side anyway)
+- `simulation.find` is a linear scan (same as d3; semantics identical)
 
-## 竞品一览
+## Competitors
 
-| 库 | 语言/交付 | 算法家族 | 活跃度 | 备注 |
+| Library | Language/Delivery | Algorithm family | Activity | Notes |
 |---|---|---|---|---|
-| **moonforce** | **MoonBit → WASM-GC** | **velocity verlet + Barnes-Hut** | **本项目** | **d3-force 语义位级对齐 + 双生态发布** |
-| d3-force | JS | velocity verlet + Barnes-Hut | 极活跃 | 事实标准，本项目的语义基准 |
-| elk.js | Java→GWT→JS | 层次/Sugiyama | 活跃 | 方向图/端口图，非力导向 |
-| dagre | JS | Sugiyama 层次 | 低频维护 | 层次布局 |
-| graphology-forceatlas2 | JS | ForceAtlas2（含 BH） | 活跃 | Sigma.js 生态 |
-| webcola | JS | 约束求解 | 低 | 学术出身 |
-| ngraph.forces | JS | 自研物理 | 中低 | vivagraph 生态 |
-| AntV G6 | TS | 多布局聚合 | 极活跃 | 平台级，非独立布局内核 |
-| ForceAtlas2 (Gephi) | Java | FA2 | 稳定 | 论文源头，桌面端 |
-| OpenOrd | C++ | 多级粗化 | 学术遗留 | 大规模 |
-| Graphviz fdp/neato | C | spring/stress | 停滞 | 批量渲染导向 |
-| OGDF | C++ | 全面 | 学术维护 | 研究库 |
-| yFiles | 商业闭源 | 工业级全家桶 | 持续 | 商业对标 |
+| **moonforce** | **MoonBit → WASM-GC** | **velocity verlet + Barnes-Hut** | **this project** | **bit-level d3-force alignment + dual-ecosystem release** |
+| d3-force | JS | velocity verlet + Barnes-Hut | very active | the de-facto standard; this project's semantic baseline |
+| elk.js | Java→GWT→JS | layered/Sugiyama | active | directed/port graphs, not force-directed |
+| dagre | JS | Sugiyama layered | low maintenance | layered layout |
+| graphology-forceatlas2 | JS | ForceAtlas2 (with BH) | active | Sigma.js ecosystem |
+| webcola | JS | constraint solving | low | academic origins |
+| ngraph.forces | JS | custom physics | medium-low | vivagraph ecosystem |
+| AntV G6 | TS | aggregated layouts | very active | platform-level, not a standalone layout kernel |
+| ForceAtlas2 (Gephi) | Java | FA2 | stable | paper's origin, desktop |
+| OpenOrd | C++ | multilevel coarsening | academic legacy | large scale |
+| Graphviz fdp/neato | C | spring/stress | dormant | batch-render oriented |
+| OGDF | C++ | comprehensive | academic | research library |
+| yFiles | commercial | industrial suite | ongoing | commercial counterpart |
 
-定位一句话：**唯一 MoonBit 原生实现、与 d3-force 3.x 位级对齐、Barnes-Hut、WASM-GC 交付、mooncakes + npm 双发布的力导向布局内核**。
+Positioning in one sentence: **the only force-directed layout kernel that is MoonBit-native, bit-level aligned with d3-force 3.x, Barnes-Hut, delivered as WASM-GC, and published to both mooncakes + npm**.
 
-## 架构
+## Architecture
 
 ```
 src/
-├── types/       SoA NodePool（FixedArray[Double] → unboxed (array f64)）
-│                + lcg（与 JS 位精确）+ jiggle
-├── quadtree/    d3-quadtree 对齐的松散四叉树（cover/add/visit/visitAfter，
-│                聚合缓存挂节点，自底向上聚合）
-├── forces/      7 种力（enum 静态分发，无 trait 装箱）
+├── types/       SoA NodePool (FixedArray[Double] → unboxed (array f64))
+│                + lcg (bit-exact with JS) + jiggle
+├── quadtree/    d3-quadtree-aligned loose quadtree (cover/add/visit/visitAfter;
+│                aggregate caches live on nodes, bottom-up aggregation)
+├── forces/      7 forces (enum static dispatch, no trait boxing)
 │                center · manyBody(Barnes-Hut) · link · collide · x · y · radial
-├── simulation/  tick 状态机（alpha 衰减三步循环）
-└── ffi/         foreign_library：30 个 mf_* 导出（i32 句柄表，
-                 纯数值 ABI → wasm Import 段为空）
+├── simulation/  tick state machine (alpha decay 3-step loop)
+└── ffi/         foreign_library: 30 mf_* exports (i32 handle table,
+                 pure numeric ABI → empty wasm import section)
 
-packages/moonforce/   npm 包（TS 胶水：loadMoonforce/Simulation 类，数据驻留 wasm）
-demo/                 交互式 demo + bench（d3-force 对比）
+packages/moonforce/   npm package (TS glue: loadMoonforce/Simulation class; data lives in wasm)
+demo/                 interactive demo + bench (d3-force comparison)
 ```
 
-数据驻留 wasm 堆（SoA），热路径零跨界；坐标读取为拉取模式（`positions()` 循环 `mf_node_x/y`，5000 节点约 0.1-0.25 ms/tick，相对计算成本可接受）。
+Data lives in the wasm heap (SoA); the hot path crosses the boundary zero times. Coordinate reads use the pull model (`positions()` loops `mf_node_x/y` — ~0.1–0.25 ms/tick at 5000 nodes, acceptable relative to compute cost).
 
-## 开发
+## Development
 
 ```bash
-bun install                # d3-force（golden/bench 用）
-moon test src/types src/quadtree src/forces src/simulation   # 27 用例（含 golden）
-bun scripts/golden.mjs     # 重新生成 golden fixture（改语义时）
-bun run build              # moon build --target wasm-gc --release + npm 包
-bun scripts/check-wasm.mjs _build/wasm-gc/release/build/src/ffi/ffi.wasm   # 断言 Import 段为空
-bun test packages/moonforce   # 端到端（含 d3 数值对齐）
+bun install                # d3-force (for golden/bench)
+moon test src/types src/quadtree src/forces src/simulation   # 27 cases (incl. golden)
+bun scripts/golden.mjs     # regenerate golden fixtures (when changing semantics)
+bun run build              # moon build --target wasm-gc --release + npm package
+bun scripts/check-wasm.mjs _build/wasm-gc/release/build/src/ffi/ffi.wasm   # assert empty import section
+bun test packages/moonforce   # end-to-end (incl. d3 numeric alignment)
 bun scripts/serve.mjs      # demo + bench
 ```
 
-工具链版本见 [AGENTS.md](AGENTS.md)（moon 工具链周更，本地与 CI 统一跟随 latest，golden 测试守卫数值语义）。
+Toolchain: see [AGENTS.md](AGENTS.md) (moon ships weekly; local dev and CI both track the latest release, with golden tests guarding the numeric semantics).
 
 ## Roadmap
 
-- [ ] per-node manyBody strength、per-link distance（函数 → 索引数组）
-- [ ] `mf_step_into`：推送模式坐标回写（经宿主导入函数，省 JS 侧循环）
-- [ ] Web Worker 封装（demo 大图布局移入 worker）
-- [ ] wasm-gc 内联 manyBody/collide 遍历（去掉闭包装箱，bench 定位后再做）
-- [ ] 多实例 force（名字 → 句柄）
+- [ ] per-node manyBody strength, per-link distance (function → index arrays)
+- [ ] `mf_step_into`: push-mode coordinate writeback (saving the JS-side pull loop)
+- [ ] Web Worker wrapper (move large-graph layout off the main thread in the demo)
+- [ ] Inline manyBody/collide traversal in wasm-gc (drop closure boxing; do after benching)
+- [ ] Multi-instance forces (name → handle)
 
 ## License
 
-MIT。语义对齐参考的 [d3-force](vendor/d3-force)（ISC 许可）与 [d3-quadtree](vendor/d3-quadtree)（ISC 许可）源码已 vendor 进仓库，谨此致谢。
+MIT. The [d3-force](vendor/d3-force) (ISC) and [d3-quadtree](vendor/d3-quadtree) (ISC) sources vendored into this repo serve as the semantic reference — with thanks.
 
 <div align="center">
 
-**简体中文** · [English](README_EN.md)
+[简体中文](README.zh-CN.md) · **English**
 
 </div>

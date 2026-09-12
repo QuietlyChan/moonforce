@@ -1,7 +1,7 @@
 // simulation 包：Velocity Verlet 积分 + alpha 衰减状态机（d3-force simulation.js）。
 import {
-  "moonforce/moonforce/src/types",
-  "moonforce/moonforce/src/forces",
+  "QuietlyChan/moonforce/src/types",
+  "QuietlyChan/moonforce/src/forces",
 }
 
 import {

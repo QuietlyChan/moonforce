@@ -2,47 +2,60 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [main, master]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      # —— MoonBit 工具链（跟随 latest，见 AGENTS.md；官方 CDN 不托管历史版本）——
-      - name: Install MoonBit toolchain
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-
-      - name: Check MoonBit version
-        run: moon version --all
-
-      # —— Bun ——
-      - uses: oven-sh/setup-bun@v2
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Install JS deps
         run: bun install --frozen-lockfile
 
-      - name: MoonBit tests (含 golden 数值对齐)
+      # 跟随 latest（官方 CDN 不托管历史版本，见 AGENTS.md）
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Show toolchain version
+        run: moon version --all
+
+      - name: Resolve MoonBit dependencies
+        run: moon update
+
+      - name: Check formatting
+        run: moon fmt --check
+
+      - name: Check packages
+        run: moon check
+
+      # moon test 全量会因 ffi 包（foreign_library）的 InlineTest 驱动失败，按包路径跑
+      - name: Run MoonBit tests (incl. golden)
         run: moon test src/types src/quadtree src/forces src/simulation
 
       - name: Build wasm-gc (release)
         run: moon build --target wasm-gc --release
 
-      - name: Assert wasm import section empty (可移植性)
+      - name: Assert wasm import section empty
         run: bun scripts/check-wasm.mjs _build/wasm-gc/release/build/src/ffi/ffi.wasm
 
       - name: Build npm package
         run: bun scripts/build.mjs
 
-      - name: TS 端到端测试 (含 d3-force 数值对齐)
+      - name: Run TS end-to-end tests (incl. d3 numeric alignment)
         run: bun test packages/moonforce
-
-      - name: Format check
-        run: moon fmt --check
